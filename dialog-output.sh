@@ -34,6 +34,8 @@ echo_code(){
 
 #! Act on the exit status
 case $DIALOG_CODE in
+$DIALOG_OK)
+    DIALOG_CODE_NAME=DIALOG_OK;;
 $DIALOG_CANCEL)
     DIALOG_CODE_NAME=DIALOG_CANCEL
     echo_code "Cancel pressed.";;
@@ -49,6 +51,8 @@ $DIALOG_ITEM_HELP)
 $DIALOG_ESC)
     DIALOG_CODE_NAME=DIALOG_ESC
     echo_code "ESC pressed.";;
+*)
+    DIALOG_CODE_NAME=DIALOG_UNKNOWN;;
 esac
 
 unset DIALOG_OK DIALOG_CANCEL DIALOG_HELP DIALOG_EXTRA DIALOG_ITEM_HELP DIALOG_ESC

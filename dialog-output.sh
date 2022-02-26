@@ -11,10 +11,14 @@
 # DIALOG_UNSET_ECHO=no
 # DIALOG_UNSET_FOREVER_ECHO=no
 
+if ! [ -e "/usr/bin/dialog" ]; then
+    echo "Dialog is not installed"
+fi
+
 #! Register outputs
 exec 3>&1
 DIALOG_RESULT=$(dialog "$@" 2>&1 1>&3)
-DIALOG_CODE=$?
+DIALOG_CODE="$?"
 exec 3>&-
 
 #! Define each error

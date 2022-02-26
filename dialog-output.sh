@@ -8,18 +8,25 @@
 #! Uncomment to get results in terminal, or set these variables elsewhere
 # DIALOG_ECHO_CODE=yes
 # DIALOG_ECHO_RESULT=yes
+# DIALOG_UNSET_ONE_ECHO=no
 # DIALOG_UNSET_ECHO=no
-# DIALOG_UNSET_FOREVER_ECHO=no
 
-if ! [ -e "/usr/bin/dialog" ]; then
+# DIALOG_NOTFOUND=yes
+# DIALOG_NOTFOUND_CODE(){ echo "My text exemple, if you don't have dialog installed";}
+
+#! Checking if dialog is installed 
+if [ -e "/usr/bin/dialog" ]; then
+    #! Register outputs
+    exec 3>&1
+    # DIALOG_RESULT=$(dialog "$@" 2>&1 1>&3)
+    DIALOG_CODE="$?"
+    exec 3>&-
+elif [ DIALOG_NOTFOUND == "" ] && ! [ -e "/usr/bin/dialog" ]; then
     echo "Dialog is not installed"
+#! If you put yes in $DIALOG_NOTFOUND and dialog is not found, will execute DIALOG_NOTFOUND_CODE
+elif [ DIALOG_NOTFOUND != "" ] && ! [ -e "/usr/bin/dialog" ]; then
+    DIALOG_NOTFOUND_CODE
 fi
-
-#! Register outputs
-exec 3>&1
-DIALOG_RESULT=$(dialog "$@" 2>&1 1>&3)
-DIALOG_CODE="$?"
-exec 3>&-
 
 #! Define each error
 : ${DIALOG_OK=0}
@@ -66,12 +73,12 @@ if [ "$DIALOG_ECHO_RESULT" != "" ]; then
     echo $DIALOG_RESULT
 fi
 
-#! unset echo result if not DIALOG_UNSET_ECHO=no
-if [ "$DIALOG_UNSET_ECHO" == "" ]; then
-    unset DIALOG_ECHO_RESULT DIALOG_ECHO_CODE DIALOG_UNSET_ECHO
+#! disable unset echo result if DIALOG_UNSET_ECHO=no
+if [ "$DIALOG_UNSET_ECHO" == "" ] && [ "$DIALOG_UNSET_ONE_ECHO" == "" ]; then
+    unset DIALOG_ECHO_RESULT DIALOG_ECHO_CODE
 fi
 
-#! unset echo result if not DIALOG_UNSET_FOREVER_ECHO=no
-if [ "$DIALOG_UNSET_FOREVER_ECHO" == "" ]; then
-    unset DIALOG_ECHO_RESULT DIALOG_ECHO_CODE
+#! disable unset echo result forever if DIALOG_UNSET_ECHO=no
+if [ "$DIALOG_UNSET_ECHO" == "" ]; then
+    unset DIALOG_UNSET_ONE_ECHO
 fi

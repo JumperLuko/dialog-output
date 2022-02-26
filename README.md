@@ -26,6 +26,10 @@ Uncomment to get results in terminal, or set these variables elsewhere
 
 `DIALOG_ECHO_RESULT=yes` -> To show the result on run
 
-`DIALOG_UNSET_ECHO=no` -> Disable remove echo parameters after running
+`DIALOG_UNSET_ONE_ECHO=no` -> Disable remove echo parameters one time
 
-`DIALOG_UNSET_FOREVER_ECHO=no` -> Disable remove echo parameters on all continuous runs, after first run
+`DIALOG_UNSET_ECHO=no` -> Disable remove echo parameters on all continuous runs
+
+## If Dialog is not installed
+Maybe dialog is not installed, and in that case you want it to run other code automatically
+

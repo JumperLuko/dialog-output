@@ -7,25 +7,35 @@
 
 #! Uncomment to get results in terminal, or set these variables elsewhere
 # DIALOG_ECHO_CODE=yes
+# DIALOG_ECHO_CODE_FOREVER=yes
 # DIALOG_ECHO_RESULT=yes
-# DIALOG_UNSET_ONE_ECHO=no
-# DIALOG_UNSET_ECHO=no
+# DIALOG_ECHO_RESULT_FOREVER=yes
 
-# DIALOG_NOTFOUND=yes
-# DIALOG_NOTFOUND_CODE(){ echo "My text exemple, if you don't have dialog installed";}
+#! Maybe dialog is not installed, and in that case you want it to run other code automatically
+# DIALOG_NOTFOUND_CODE(){ echo "My text exemple, if you don't have dialog installed"; read -p "type something: " DIALOG_RESULT;}
+# DIALOG_NOTFOUND_FOREVER=yes
+
+if [ "$dialog" == "" ] || ! [ -e "$dialog" ]; then
+    dialog="/usr/bin/dialog"
+fi
 
 #! Checking if dialog is installed 
-if [ -e "/usr/bin/dialog" ]; then
+if [ -e "$dialog" ]; then
     #! Register outputs
     exec 3>&1
-    # DIALOG_RESULT=$(dialog "$@" 2>&1 1>&3)
+    DIALOG_RESULT=$("$dialog" "$@" 2>&1 1>&3)
     DIALOG_CODE="$?"
     exec 3>&-
-elif [ DIALOG_NOTFOUND == "" ] && ! [ -e "/usr/bin/dialog" ]; then
+elif [[ $(type -t DIALOG_NOTFOUND_CODE) != function ]] && ! [ -e "$dialog" ]; then
     echo "Dialog is not installed"
 #! If you put yes in $DIALOG_NOTFOUND and dialog is not found, will execute DIALOG_NOTFOUND_CODE
-elif [ DIALOG_NOTFOUND != "" ] && ! [ -e "/usr/bin/dialog" ]; then
+elif [[ $(type -t DIALOG_NOTFOUND_CODE) == function ]] && ! [ -e "$dialog" ]; then
     DIALOG_NOTFOUND_CODE
+fi
+
+#! To run this funcion on every run, if dialog is not installed DIALOG_NOTFOUND_FOREVER=yes
+if [ "$DIALOG_NOTFOUND_FOREVER" == "" ]; then
+    unset -f DIALOG_NOTFOUND_CODE
 fi
 
 #! Define each error
@@ -38,7 +48,7 @@ fi
 
 #! echo exit code if DIALOG_ECHO_CODE=yes
 echo_code(){
-    if [ "$DIALOG_ECHO_CODE" != "" ]; then
+    if [ "$DIALOG_ECHO_CODE" != "" ] || [ "$DIALOG_ECHO_CODE_FOREVER" != "" ]; then
         echo "$1"
     fi
 }
@@ -68,17 +78,17 @@ esac
 
 unset DIALOG_OK DIALOG_CANCEL DIALOG_HELP DIALOG_EXTRA DIALOG_ITEM_HELP DIALOG_ESC
 
+#! echo the code forever on every run if DIALOG_ECHO_RESULT_FOREVER=yes
+if [ "$DIALOG_ECHO_CODE_FOREVER" == "" ]; then
+    unset DIALOG_ECHO_CODE
+fi
+
 #! echo result if DIALOG_ECHO_RESULT=yes
-if [ "$DIALOG_ECHO_RESULT" != "" ]; then
+if [ "$DIALOG_ECHO_RESULT" != "" ] || [ "$DIALOG_ECHO_RESULT_FOREVER" != "" ]; then
     echo $DIALOG_RESULT
 fi
 
-#! disable unset echo result if DIALOG_UNSET_ECHO=no
-if [ "$DIALOG_UNSET_ECHO" == "" ] && [ "$DIALOG_UNSET_ONE_ECHO" == "" ]; then
+#! echo the result forever on every run if DIALOG_ECHO_RESULT_FOREVER=yes
+if [ "$DIALOG_ECHO_RESULT_FOREVER" == "" ]; then
     unset DIALOG_ECHO_RESULT DIALOG_ECHO_CODE
-fi
-
-#! disable unset echo result forever if DIALOG_UNSET_ECHO=no
-if [ "$DIALOG_UNSET_ECHO" == "" ]; then
-    unset DIALOG_UNSET_ONE_ECHO
 fi

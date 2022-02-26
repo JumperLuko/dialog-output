@@ -5,8 +5,8 @@ if [ -e "/usr/bin/dialog" ] && [ -e "dialog-output.sh" ]; then
     dialog --backtitle "dialog-output installer" --yesno "\nDo you want to install dialog-output?!" 7 50
     if [ "$?" == 0 ]; then
         sudo cp dialog-output.sh /usr/bin/dialog-output
-        sudo chmod +x /usr/bin/dialog-ouput
-        if [ -e "/usr/bin/dialog-ouput" ]; then
+        sudo chmod +x /usr/bin/dialog-output
+        if [ -e "/usr/bin/dialog-output" ]; then
             dialog --backtitle "dialog-output installer" --title "Sucess!" --msgbox "\nDialog-output is installed!" 7 40
         else
             dialog --backtitle "dialog-output installer" --title "Error!" --msgbox "\nDialog-output installation failed!" 7 50
